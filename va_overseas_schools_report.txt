@@ -1,0 +1,30 @@
+
+VA OVERSEAS SCHOOLS ANALYSIS REPORT
+==================================================
+
+SUMMARY STATISTICS:
+- Total overseas schools: 5
+- Countries with VA schools: 5
+- Average tuition: $28,000.00
+- Average cost of living index: 60.55
+
+SCHOOLS BY COUNTRY:
+                INSTITUTION  TUITION_OUT_OF_STATE  Cost of Living Index  Rent Index  Local Purchasing Power Index
+COUNTRY                                                                                                          
+Australia                 1               28000.0                  70.2        33.4                         127.4
+France                    1               30000.0                  63.7        21.0                         102.4
+Germany                   1               22000.0                  62.2        24.4                         120.2
+Japan                     1               35000.0                  46.1        13.4                         117.0
+United Kingdom            1               25000.0                   NaN         NaN                           NaN
+
+DATA STRUCTURE:
+Available columns in merged dataset:
+['FACILITY_CODE', 'INSTITUTION', 'CITY', 'STATE', 'COUNTRY', 'TYPE', 'TUITION_IN_STATE', 'TUITION_OUT_OF_STATE', 'Country_Clean', 'Rank', 'Country', 'Cost of Living Index', 'Rent Index', 'Cost of Living Plus Rent Index', 'Groceries Index', 'Restaurant Price Index', 'Local Purchasing Power Index']
+
+SAMPLE DATA:
+  FACILITY_CODE                       INSTITUTION    CITY    STATE         COUNTRY     TYPE  TUITION_IN_STATE  TUITION_OUT_OF_STATE Country_Clean  Rank    Country  Cost of Living Index  Rent Index  Cost of Living Plus Rent Index  Groceries Index  Restaurant Price Index  Local Purchasing Power Index
+0      12345678              University of London  London  FOREIGN  United Kingdom  Private             25000                 25000            UK   NaN        NaN                   NaN         NaN                             NaN              NaN                     NaN                           NaN
+1      23456789      American University of Paris   Paris  FOREIGN          France  Private             30000                 30000        France  15.0     France                  63.7        21.0                            43.2             69.5                    56.3                         102.4
+2      34567890  International School of Business  Sydney  FOREIGN       Australia  Private             28000                 28000     Australia  10.0  Australia                  70.2        33.4                            52.5             77.3                    62.5                         127.4
+3      45678901        Berlin Technical Institute  Berlin  FOREIGN         Germany   Public             22000                 22000       Germany  21.0    Germany                  62.2        24.4                            44.0             60.8                    52.8                         120.2
+4      56789012    Tokyo International University   Tokyo  FOREIGN           Japan  Private             35000                 35000         Japan  46.0      Japan                  46.1        13.4                            30.4             53.7                    27.8                         117.0
