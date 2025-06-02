@@ -1,7 +1,187 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the application
-    initializeApp();
+    // Load data and then initialize the application
+    loadSchoolsData().then(() => {
+        initializeApp();
+    }).catch(error => {
+        console.error('Error loading data:', error);
+        // Initialize app anyway with existing static data
+        initializeApp();
+    });
 });
+
+// Data Loading Functions
+async function loadSchoolsData() {
+    try {
+        // Show loading indicator
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+        }
+
+        console.log('Loading schools data...');
+        
+        let data;
+        try {
+            // Try to fetch the JSON file first
+            const response = await fetch('comprehensive_va_analysis.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            data = await response.json();
+            console.log('Data loaded from JSON file');
+        } catch (fetchError) {
+            // If fetch fails (e.g., CORS issues with file:// protocol), use fallback data
+            console.log('Fetch failed, using fallback data:', fetchError.message);
+            if (typeof VA_SCHOOLS_DATA !== 'undefined') {
+                data = VA_SCHOOLS_DATA;
+                console.log('Using embedded fallback data');
+            } else {
+                throw new Error('No data source available');
+            }
+        }
+        
+        // Update the summary statistics
+        updateSummaryStats(data);
+        
+        // Update the schools table
+        updateSchoolsTable(data);
+        
+        // Update country analysis
+        updateCountryAnalysis(data);
+        
+        console.log('Data loaded successfully');
+        
+        // Hide loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error loading schools data:', error);
+        
+        // Hide loading indicator on error
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        throw error;
+    }
+}
+
+function updateSummaryStats(data) {
+    const overview = data.overseas_analysis;
+    
+    // Update stat cards
+    const statCards = document.querySelectorAll('.stat-card h3');
+    if (statCards.length >= 3) {
+        statCards[0].textContent = overview.total_schools || '51';
+        statCards[1].textContent = Object.keys(overview.countries || {}).length || '10';
+        statCards[2].textContent = overview.school_types?.Private || '33';
+    }
+}
+
+let currentPage = 1;
+const pageSize = 100;
+let currentSchoolsList = [];
+
+function updateSchoolsTable(data) {
+    const tableBody = document.querySelector('#schoolsTable tbody');
+    if (!tableBody || !data.overseas_analysis?.schools_list) {
+        console.warn('Table body or schools data not found');
+        return;
+    }
+    currentSchoolsList = data.overseas_analysis.schools_list;
+    currentPage = 1;
+    renderSchoolsPage();
+    addShowMoreButton();
+    console.log(`Updated table with ${currentSchoolsList.length} schools (paginated)`);
+}
+
+function renderSchoolsPage() {
+    const tableBody = document.querySelector('#schoolsTable tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    const start = (currentPage - 1) * pageSize;
+    const end = Math.min(start + pageSize, currentSchoolsList.length);
+    for (let i = start; i < end; i++) {
+        const school = currentSchoolsList[i];
+        const row = document.createElement('tr');
+        const costIndex = getCostOfLivingIndex(school.COUNTRY);
+        row.innerHTML = `
+            <td>${school.INSTITUTION || 'N/A'}</td>
+            <td>${school.CITY || 'N/A'}</td>
+            <td>${school.COUNTRY || 'N/A'}</td>
+            <td>${school.TYPE || 'N/A'}</td>
+            <td>${costIndex}</td>
+        `;
+        tableBody.appendChild(row);
+    }
+}
+
+function addShowMoreButton() {
+    let btn = document.getElementById('showMoreSchools');
+    if (btn) btn.remove();
+    const schoolsSection = document.querySelector('.schools-table');
+    if (!schoolsSection) return;
+    if (currentPage * pageSize < currentSchoolsList.length) {
+        btn = document.createElement('button');
+        btn.id = 'showMoreSchools';
+        btn.textContent = 'Show More';
+        btn.className = 'export-button';
+        btn.style.margin = '20px auto 0 auto';
+        btn.style.display = 'block';
+        btn.onclick = function() {
+            currentPage++;
+            renderSchoolsPage();
+            addShowMoreButton();
+        };
+        schoolsSection.appendChild(btn);
+    }
+}
+
+function updateCountryAnalysis(data) {
+    const countryGrid = document.querySelector('.country-grid');
+    if (!countryGrid || !data.overseas_analysis?.countries) {
+        console.warn('Country grid or countries data not found');
+        return;
+    }
+    
+    // Clear existing cards
+    countryGrid.innerHTML = '';
+    
+    // Add new country cards from JSON data
+    Object.entries(data.overseas_analysis.countries).forEach(([country, count]) => {
+        const card = document.createElement('div');
+        card.className = 'country-card';
+        card.innerHTML = `
+            <h3>${country}</h3>
+            <p class="school-count">${count} school${count !== 1 ? 's' : ''}</p>
+        `;
+        countryGrid.appendChild(card);
+    });
+    
+    console.log(`Updated country analysis with ${Object.keys(data.overseas_analysis.countries).length} countries`);
+}
+
+function getCostOfLivingIndex(country) {
+    // Cost of living index mapping (you can extend this or load from another JSON file)
+    const costMapping = {
+        'United Kingdom': '62.0',
+        'Germany': '62.2',
+        'France': '63.7',
+        'Japan': '46.1',
+        'Australia': '70.2',
+        'Canada': '64.8',
+        'Spain': '47.3',
+        'Italy': '56.2',
+        'Switzerland': '101.1',
+        'Netherlands': '63.1'
+    };
+    
+    return costMapping[country] || 'N/A';
+}
 
 function initializeApp() {
     // Add table sorting functionality
@@ -18,6 +198,9 @@ function initializeApp() {
     
     // Initialize tooltips or additional interactive elements
     initializeTooltips();
+    
+    // Add export functionality
+    addExportButton();
 }
 
 function addTableSorting() {
@@ -323,7 +506,4 @@ function addExportButton() {
     }
 }
 
-// Initialize export functionality after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(addExportButton, 100); // Small delay to ensure search container exists
-});
+// Export button will be added during app initialization

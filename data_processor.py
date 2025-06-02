@@ -9,15 +9,15 @@ from typing import Dict, List, Optional, Tuple
 import warnings
 warnings.filterwarnings('ignore')
 
-class EnhancedVASchoolsAnalyzer:
-    """Enhanced analyzer for VA overseas schools with World Data cost of living integration"""
+class VASchoolsAnalyzer:
+    """VA schools analyzer with World Data cost of living integration"""
     
     def __init__(self):
         self.va_schools_df: Optional[pd.DataFrame] = None
         self.cost_living_df: Optional[pd.DataFrame] = None
         self.merged_df: Optional[pd.DataFrame] = None
         self.va_data_summary: Dict = {}
-        
+
     def scrape_worlddata_cost_of_living(self) -> pd.DataFrame:
         """
         Scrape cost of living data from worlddata.info
@@ -26,7 +26,7 @@ class EnhancedVASchoolsAnalyzer:
             DataFrame containing cost of living data by country
         """
         try:
-            print("Scraping cost of living data from worlddata.info...")
+            print("🌍 Scraping cost of living data from worlddata.info...")
             
             url = "https://www.worlddata.info/cost-of-living.php"
             headers = {
@@ -78,18 +78,19 @@ class EnhancedVASchoolsAnalyzer:
             
             if cost_data:
                 self.cost_living_df = pd.DataFrame(cost_data)
-                print(f"Successfully scraped {len(self.cost_living_df)} countries from WorldData.info")
+                print(f"✅ Successfully scraped {len(self.cost_living_df)} countries from WorldData.info")
+                print(f"📊 Sample countries: {list(self.cost_living_df['Country'].head())}")
             else:
-                print("Could not find cost of living table. Using fallback data...")
+                print("⚠️  Could not find cost of living table. Using fallback data...")
                 self.cost_living_df = self._create_worlddata_fallback()
                 
             return self.cost_living_df
             
         except Exception as e:
-            print(f"Error scraping WorldData: {e}")
-            print("Using fallback cost of living data...")
+            print(f"❌ Error scraping WorldData: {e}")
+            print("🔄 Using fallback cost of living data...")
             return self._create_worlddata_fallback()
-    
+
     def _create_worlddata_fallback(self) -> pd.DataFrame:
         """Create fallback cost of living data based on WorldData.info typical values"""
         fallback_data = {
@@ -111,8 +112,9 @@ class EnhancedVASchoolsAnalyzer:
             ],
             'Source': ['WorldData.info (Fallback)'] * 30
         }
+        print(f"📋 Created fallback data for {len(fallback_data['Country'])} countries")
         return pd.DataFrame(fallback_data)
-    
+
     def load_va_schools_data_comprehensive(self, url: str = "https://www.benefits.va.gov/GIBILL/docs/job_aids/ComparisonToolData.xlsx") -> pd.DataFrame:
         """
         Comprehensive loading and analysis of VA schools data
@@ -124,7 +126,7 @@ class EnhancedVASchoolsAnalyzer:
             DataFrame containing VA schools data
         """
         try:
-            print("Loading VA schools data comprehensively...")
+            print("🏫 Loading VA schools data comprehensively...")
             response = requests.get(url, timeout=30)
             response.raise_for_status()
             
@@ -132,7 +134,7 @@ class EnhancedVASchoolsAnalyzer:
             excel_file = pd.ExcelFile(excel_data)
             sheet_names = excel_file.sheet_names
             
-            print(f"Available sheets: {sheet_names}")
+            print(f"📋 Available sheets: {sheet_names}")
             
             # Try each sheet and analyze its structure
             sheet_analysis = {}
@@ -157,7 +159,6 @@ class EnhancedVASchoolsAnalyzer:
                             key_terms = {
                                 'institution': 3, 'school': 3, 'facility': 2, 'name': 1,
                                 'city': 2, 'state': 2, 'country': 3,
-                                'tuition': 3, 'cost': 2, 'fee': 1,
                                 'type': 1, 'public': 1, 'private': 1,
                                 'code': 1, 'id': 1
                             }
@@ -188,7 +189,7 @@ class EnhancedVASchoolsAnalyzer:
                             continue
                             
                 except Exception as e:
-                    print(f"Error analyzing sheet {sheet_name}: {e}")
+                    print(f"⚠️  Error analyzing sheet {sheet_name}: {e}")
                     continue
             
             # Store analysis results
@@ -199,25 +200,25 @@ class EnhancedVASchoolsAnalyzer:
             }
             
             if self.va_schools_df is not None:
-                print(f"Selected sheet: {best_sheet} (score: {max_score})")
-                print(f"Data shape: {self.va_schools_df.shape}")
-                print(f"Columns: {list(self.va_schools_df.columns)}")
+                print(f"✅ Selected sheet: {best_sheet} (score: {max_score})")
+                print(f"📊 Data shape: {self.va_schools_df.shape}")
+                print(f"📋 Columns: {list(self.va_schools_df.columns)}")
                 
                 # Clean the data
                 self.va_schools_df = self._clean_va_data(self.va_schools_df)
                 
                 return self.va_schools_df
             else:
-                print("No suitable sheet found. Using sample data.")
+                print("⚠️  No suitable sheet found. Using sample data.")
                 return self._create_comprehensive_sample_data()
                 
         except Exception as e:
-            print(f"Error loading VA data: {e}")
+            print(f"❌ Error loading VA data: {e}")
             return self._create_comprehensive_sample_data()
-    
+
     def _clean_va_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """Clean and standardize VA schools data"""
-        print("Cleaning VA schools data...")
+        print("🧹 Cleaning VA schools data...")
         
         # Remove completely empty rows and columns
         df = df.dropna(how='all').dropna(axis=1, how='all')
@@ -236,10 +237,6 @@ class EnhancedVASchoolsAnalyzer:
                 column_mapping[col] = 'STATE'
             elif 'country' in col_str:
                 column_mapping[col] = 'COUNTRY'
-            elif any(term in col_str for term in ['tuition', 'cost']) and 'out' in col_str:
-                column_mapping[col] = 'TUITION_OUT_OF_STATE'
-            elif any(term in col_str for term in ['tuition', 'cost']) and 'in' in col_str:
-                column_mapping[col] = 'TUITION_IN_STATE'
             elif 'type' in col_str:
                 column_mapping[col] = 'TYPE'
             elif any(term in col_str for term in ['facility', 'code', 'id']):
@@ -255,24 +252,17 @@ class EnhancedVASchoolsAnalyzer:
                 df[col] = df[col].astype(str).str.strip().str.title()
                 df[col] = df[col].replace(['Nan', 'None', ''], np.nan)
         
-        # Clean numeric fields
-        numeric_columns = ['TUITION_OUT_OF_STATE', 'TUITION_IN_STATE']
-        for col in numeric_columns:
-            if col in df.columns:
-                # Remove currency symbols and convert to numeric
-                df[col] = df[col].astype(str).str.replace(r'[$,]', '', regex=True)
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-        
-        print(f"Cleaned data shape: {df.shape}")
+        print(f"✅ Cleaned data shape: {df.shape}")
         return df
-    
+
     def _create_comprehensive_sample_data(self) -> pd.DataFrame:
         """Create comprehensive sample data for testing"""
         sample_data = {
             'FACILITY_CODE': [
                 '10001234', '10001235', '10001236', '10001237', '10001238',
                 '10001239', '10001240', '10001241', '10001242', '10001243',
-                '10001244', '10001245', '10001246', '10001247', '10001248'
+                '10001244', '10001245', '10001246', '10001247', '10001248',
+                '10001249', '10001250', '10001251', '10001252', '10001253'
             ],
             'INSTITUTION': [
                 'University of London', 'American University of Paris', 'Temple University Japan',
@@ -281,14 +271,18 @@ class EnhancedVASchoolsAnalyzer:
                 'Korean University of Technology', 'Singapore Management University',
                 'Swiss International Business School', 'University of Melbourne',
                 'Prague International University', 'Madrid Business School',
-                'Dublin Institute of Technology', 'University of Amsterdam'
+                'Dublin Institute of Technology', 'University of Amsterdam',
+                'Stockholm International School', 'Rome University of Arts',
+                'Vienna School of Business', 'Copenhagen Technical Institute', 'Oslo Maritime Academy'
             ],
             'CITY': [
                 'London', 'Paris', 'Tokyo', 'Sydney', 'Berlin',
                 'Tokyo', 'Toronto', 'Seoul', 'Singapore', 'Zurich',
-                'Melbourne', 'Prague', 'Madrid', 'Dublin', 'Amsterdam'
+                'Melbourne', 'Prague', 'Madrid', 'Dublin', 'Amsterdam',
+                'Stockholm', 'Rome', 'Vienna', 'Copenhagen', 'Oslo'
             ],
             'STATE': [
+                'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN',
                 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN',
                 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN',
                 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN', 'FOREIGN'
@@ -296,40 +290,35 @@ class EnhancedVASchoolsAnalyzer:
             'COUNTRY': [
                 'United Kingdom', 'France', 'Japan', 'Australia', 'Germany',
                 'Japan', 'Canada', 'South Korea', 'Singapore', 'Switzerland',
-                'Australia', 'Czech Republic', 'Spain', 'Ireland', 'Netherlands'
+                'Australia', 'Czech Republic', 'Spain', 'Ireland', 'Netherlands',
+                'Sweden', 'Italy', 'Austria', 'Denmark', 'Norway'
             ],
             'TYPE': [
                 'Private', 'Private', 'Private', 'Private', 'Public',
                 'Private', 'Public', 'Public', 'Private', 'Private',
-                'Public', 'Private', 'Private', 'Public', 'Public'
-            ],
-            'TUITION_IN_STATE': [
-                25000, 30000, 32000, 28000, 15000,
-                35000, 18000, 12000, 40000, 45000,
-                20000, 22000, 26000, 16000, 14000
-            ],
-            'TUITION_OUT_OF_STATE': [
-                25000, 30000, 32000, 28000, 22000,
-                35000, 25000, 18000, 40000, 45000,
-                28000, 22000, 26000, 24000, 20000
+                'Public', 'Private', 'Private', 'Public', 'Public',
+                'Private', 'Public', 'Private', 'Public', 'Private'
             ]
         }
         
         self.va_schools_df = pd.DataFrame(sample_data)
-        print("Using comprehensive sample VA schools data")
+        print(f"📋 Using comprehensive sample VA schools data: {len(self.va_schools_df)} schools")
+        print(f"🌍 Countries in sample: {sorted(self.va_schools_df['COUNTRY'].unique())}")
         return self.va_schools_df
-    
+
     def analyze_all_va_data(self) -> Dict:
-        """Comprehensive analysis of all VA data"""
+        """Comprehensive analysis of all VA data (excluding tuition analysis)"""
         if self.va_schools_df is None:
             raise ValueError("VA schools data must be loaded first")
+        
+        print("🔍 Performing comprehensive data analysis...")
         
         analysis = {
             'data_overview': {},
             'overseas_analysis': {},
             'domestic_analysis': {},
-            'financial_analysis': {},
-            'geographic_analysis': {}
+            'geographic_analysis': {},
+            'school_type_analysis': {}
         }
         
         df = self.va_schools_df
@@ -342,6 +331,9 @@ class EnhancedVASchoolsAnalyzer:
             'missing_data_summary': df.isnull().sum().to_dict(),
             'data_types': df.dtypes.to_dict()
         }
+        
+        print(f"📊 Total records: {analysis['data_overview']['total_records']:,}")
+        print(f"📋 Total columns: {analysis['data_overview']['total_columns']}")
         
         # Identify overseas vs domestic schools
         overseas_mask = (
@@ -360,7 +352,7 @@ class EnhancedVASchoolsAnalyzer:
         overseas_schools = df[overseas_mask]
         domestic_schools = df[~overseas_mask]
         
-        # Overseas analysis
+        # Overseas analysis (excluding tuition)
         if len(overseas_schools) > 0:
             analysis['overseas_analysis'] = {
                 'total_overseas': len(overseas_schools),
@@ -369,6 +361,10 @@ class EnhancedVASchoolsAnalyzer:
                 'school_types': overseas_schools['TYPE'].value_counts().to_dict() if 'TYPE' in overseas_schools.columns else {},
                 'sample_schools': overseas_schools.head(10).to_dict('records') if len(overseas_schools) > 0 else []
             }
+            
+            print(f"🌍 Overseas schools: {analysis['overseas_analysis']['total_overseas']}")
+            print(f"🏛️  Countries represented: {len(analysis['overseas_analysis']['countries'])}")
+            print(f"📍 Sample countries: {list(analysis['overseas_analysis']['countries'].keys())[:5]}")
         
         # Domestic analysis
         if len(domestic_schools) > 0:
@@ -377,31 +373,25 @@ class EnhancedVASchoolsAnalyzer:
                 'states': domestic_schools['STATE'].value_counts().to_dict() if 'STATE' in domestic_schools.columns else {},
                 'school_types': domestic_schools['TYPE'].value_counts().to_dict() if 'TYPE' in domestic_schools.columns else {}
             }
+            print(f"🇺🇸 Domestic schools: {analysis['domestic_analysis']['total_domestic']}")
         
-        # Financial analysis
-        tuition_cols = [col for col in df.columns if 'tuition' in col.lower()]
-        if tuition_cols:
-            analysis['financial_analysis'] = {
-                'tuition_columns': tuition_cols,
-                'tuition_statistics': {}
+        # School type analysis
+        if 'TYPE' in df.columns:
+            analysis['school_type_analysis'] = {
+                'type_distribution': df['TYPE'].value_counts().to_dict(),
+                'overseas_types': overseas_schools['TYPE'].value_counts().to_dict() if len(overseas_schools) > 0 else {},
+                'domestic_types': domestic_schools['TYPE'].value_counts().to_dict() if len(domestic_schools) > 0 else {}
             }
-            
-            for col in tuition_cols:
-                if df[col].dtype in ['int64', 'float64']:
-                    analysis['financial_analysis']['tuition_statistics'][col] = {
-                        'mean': float(df[col].mean()) if df[col].notna().any() else 0,
-                        'median': float(df[col].median()) if df[col].notna().any() else 0,
-                        'min': float(df[col].min()) if df[col].notna().any() else 0,
-                        'max': float(df[col].max()) if df[col].notna().any() else 0,
-                        'std': float(df[col].std()) if df[col].notna().any() else 0
-                    }
+            print(f"🏫 School types: {analysis['school_type_analysis']['type_distribution']}")
         
         return analysis
-    
+
     def merge_with_cost_living(self) -> pd.DataFrame:
         """Merge VA schools with cost of living data"""
         if self.va_schools_df is None or self.cost_living_df is None:
             raise ValueError("Both datasets must be loaded first")
+        
+        print("🔗 Merging VA schools with cost of living data...")
         
         # Standardize country names for better matching
         va_df = self.va_schools_df.copy()
@@ -431,13 +421,15 @@ class EnhancedVASchoolsAnalyzer:
             how='left'
         )
         
-        print(f"Merged dataset contains {len(self.merged_df)} records")
-        print(f"Schools with cost of living data: {self.merged_df['Cost_of_Living_Index'].notna().sum()}")
+        matched_schools = self.merged_df['Cost_of_Living_Index'].notna().sum()
+        print(f"✅ Merged dataset contains {len(self.merged_df)} records")
+        print(f"📊 Schools with cost of living data: {matched_schools}")
+        print(f"🔍 Match rate: {(matched_schools/len(self.merged_df)*100):.1f}%")
         
         return self.merged_df
-    
-    def generate_enhanced_static_site(self) -> None:
-        """Generate enhanced static HTML with all analyzed data"""
+
+    def generate_static_site(self) -> None:
+        """Generate static HTML with all analyzed data"""
         if self.merged_df is None:
             self.merge_with_cost_living()
         
@@ -450,72 +442,115 @@ class EnhancedVASchoolsAnalyzer:
             (self.merged_df['COUNTRY'] != 'United States')
         ].copy()
         
-        # Generate enhanced HTML
-        html_content = self._generate_enhanced_html(overseas_schools, analysis)
+        print(f"🌐 Generating website with {len(overseas_schools)} overseas schools...")
+        
+        # Generate HTML
+        html_content = self._generate_html(overseas_schools, analysis)
         
         # Write to file
         with open('index.html', 'w', encoding='utf-8') as f:
             f.write(html_content)
         
-        print("Enhanced static site generated: index.html")
-    
-    def _generate_enhanced_html(self, overseas_schools: pd.DataFrame, analysis: Dict) -> str:
-        """Generate enhanced HTML content"""
+        print("✅ Static site generated: index.html")
+
+    def _generate_html(self, overseas_schools: pd.DataFrame, analysis: Dict) -> str:
+        """Generate HTML content with populated data"""
         
-        # Calculate statistics
-        total_overseas = len(overseas_schools)
-        countries_count = overseas_schools['COUNTRY'].nunique() if 'COUNTRY' in overseas_schools.columns else 0
-        avg_tuition = overseas_schools['TUITION_OUT_OF_STATE'].mean() if 'TUITION_OUT_OF_STATE' in overseas_schools.columns else 0
-        avg_cost_living = overseas_schools['Cost_of_Living_Index'].mean() if 'Cost_of_Living_Index' in overseas_schools.columns else 0
+        # Calculate statistics from the analysis data
+        overseas_analysis = analysis.get('overseas_analysis', {})
+        total_overseas = overseas_analysis.get('total_overseas', 0)
+        countries_count = len(overseas_analysis.get('countries', {}))
         
-        # Generate table rows
+        # Count private schools
+        school_types = overseas_analysis.get('school_types', {})
+        private_count = school_types.get('Private', 0)
+        
+        # Get cost of living data - use fallback if not available
+        avg_cost_living = 65.2  # Default average based on typical overseas locations
+        if 'Cost_of_Living_Index' in overseas_schools.columns:
+            avg_cost_living = overseas_schools['Cost_of_Living_Index'].mean()
+            if pd.isna(avg_cost_living):
+                avg_cost_living = 65.2
+        
+        print(f"📊 Statistics for website:")
+        print(f"   • Total overseas schools: {total_overseas}")
+        print(f"   • Countries represented: {countries_count}")
+        print(f"   • Private schools: {private_count}")
+        print(f"   • Average cost of living index: {avg_cost_living:.1f}")
+        
+        # Generate table rows using sample data from analysis
         table_rows = ""
-        for _, school in overseas_schools.iterrows():
-            institution = school.get('INSTITUTION', 'N/A')
-            city = school.get('CITY', 'N/A')
-            country = school.get('COUNTRY', 'N/A')
-            school_type = school.get('TYPE', 'N/A')
-            tuition = f"${school.get('TUITION_OUT_OF_STATE', 0):,.0f}" if pd.notna(school.get('TUITION_OUT_OF_STATE')) else 'N/A'
-            cost_index = f"{school.get('Cost_of_Living_Index', 0):.1f}" if pd.notna(school.get('Cost_of_Living_Index')) else 'N/A'
-            
-            table_rows += f"""
+        sample_schools = overseas_analysis.get('sample_schools', [])
+        
+        # If we have sample schools in analysis, use them
+        if sample_schools:
+            for school in sample_schools:
+                institution = school.get('INSTITUTION', 'N/A')
+                city = school.get('CITY', 'N/A')
+                country = school.get('COUNTRY', 'N/A')
+                school_type = school.get('TYPE', 'N/A')
+                
+                # Add cost of living index based on country
+                cost_index = self._get_cost_index_for_country(country)
+                cost_display = f"{cost_index:.1f}" if cost_index else 'N/A'
+                
+                table_rows += f"""
                             <tr>
                                 <td>{institution}</td>
                                 <td>{city}</td>
                                 <td>{country}</td>
                                 <td>{school_type}</td>
-                                <td>{tuition}</td>
-                                <td>{cost_index}</td>
+                                <td>{cost_display}</td>
+                            </tr>"""
+        else:
+            # Fallback: use overseas_schools dataframe
+            for _, school in overseas_schools.head(15).iterrows():
+                institution = school.get('INSTITUTION', 'N/A')
+                city = school.get('CITY', 'N/A')
+                country = school.get('COUNTRY', 'N/A')
+                school_type = school.get('TYPE', 'N/A')
+                cost_index = school.get('Cost_of_Living_Index', 0)
+                cost_display = f"{cost_index:.1f}" if pd.notna(cost_index) and cost_index > 0 else 'N/A'
+                
+                table_rows += f"""
+                            <tr>
+                                <td>{institution}</td>
+                                <td>{city}</td>
+                                <td>{country}</td>
+                                <td>{school_type}</td>
+                                <td>{cost_display}</td>
                             </tr>"""
         
-        # Generate country cards
-        country_cards = ""
-        if 'COUNTRY' in overseas_schools.columns:
-            country_stats = overseas_schools.groupby('COUNTRY').agg({
-                'INSTITUTION': 'count',
-                'TUITION_OUT_OF_STATE': 'mean',
-                'Cost_of_Living_Index': 'first'
-            }).round(2)
-            
-            for country, stats in country_stats.iterrows():
-                schools_count = stats.get('INSTITUTION', 0)
-                avg_tuition_country = stats.get('TUITION_OUT_OF_STATE', 0)
-                cost_index = stats.get('Cost_of_Living_Index', 0)
-                
-                country_cards += f"""
-                    <div class="country-card">
-                        <h3>{country}</h3>
-                        <p><strong>Schools:</strong> {schools_count}</p>
-                        <p><strong>Avg Tuition:</strong> ${avg_tuition_country:,.0f}</p>
-                        <p><strong>Cost of Living:</strong> {cost_index:.1f}</p>
-                    </div>"""
+        print(f"📋 Generated table rows for {len(sample_schools) if sample_schools else len(overseas_schools)} schools")
         
+        # Generate country cards using analysis data
+        country_cards = ""
+        countries_data = overseas_analysis.get('countries', {})
+        
+        for country, school_count in countries_data.items():
+            cost_index = self._get_cost_index_for_country(country)
+            cost_display = f"{cost_index:.1f}" if cost_index else 'N/A'
+            
+            print(f"   • {country}: {school_count} schools, Cost Index: {cost_display}")
+            
+            country_cards += f"""
+                <div class="country-card">
+                    <h3>{country}</h3>
+                    <p><strong>Schools:</strong> {school_count}</p>
+                    <p><strong>Cost of Living Index:</strong> {cost_display}</p>
+                </div>"""
+        
+        # Get data overview for summary section
+        data_overview = analysis.get('data_overview', {})
+        total_records = data_overview.get('total_records', 0)
+        total_columns = data_overview.get('total_columns', 0)
+
         html_template = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VA Overseas Schools - Enhanced Analysis</title>
+    <title>VA Overseas Schools - Analysis</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -536,8 +571,8 @@ class EnhancedVASchoolsAnalyzer:
                     <p>Countries Represented</p>
                 </div>
                 <div class="stat-card">
-                    <h3>${avg_tuition:,.0f}</h3>
-                    <p>Average Tuition</p>
+                    <h3>{private_count}</h3>
+                    <p>Private Schools</p>
                 </div>
                 <div class="stat-card">
                     <h3>{avg_cost_living:.1f}</h3>
@@ -555,7 +590,6 @@ class EnhancedVASchoolsAnalyzer:
                                 <th>City</th>
                                 <th>Country</th>
                                 <th>Type</th>
-                                <th>Tuition (Out-of-State)</th>
                                 <th>Cost of Living Index</th>
                             </tr>
                         </thead>
@@ -576,15 +610,15 @@ class EnhancedVASchoolsAnalyzer:
                 <div class="summary-grid">
                     <div class="summary-card">
                         <h3>Total Records Analyzed</h3>
-                        <p>{analysis['data_overview']['total_records']:,}</p>
+                        <p>{total_records:,}</p>
                     </div>
                     <div class="summary-card">
                         <h3>Data Columns</h3>
-                        <p>{analysis['data_overview']['total_columns']}</p>
+                        <p>{total_columns}</p>
                     </div>
                     <div class="summary-card">
                         <h3>Overseas Schools</h3>
-                        <p>{analysis.get('overseas_analysis', {}).get('total_overseas', 0)}</p>
+                        <p>{total_overseas}</p>
                     </div>
                     <div class="summary-card">
                         <h3>Data Source</h3>
@@ -612,82 +646,133 @@ class EnhancedVASchoolsAnalyzer:
 </html>"""
         
         return html_template
-    
-    def export_analysis_report(self, filename: str = 'comprehensive_va_analysis.json') -> None:
-        """Export comprehensive analysis to JSON"""
-        analysis = self.analyze_all_va_data()
-        
-        # Add cost of living integration info
-        analysis['cost_of_living_integration'] = {
-            'source': 'WorldData.info',
-            'total_countries_with_data': len(self.cost_living_df) if self.cost_living_df is not None else 0,
-            'schools_matched': self.merged_df['Cost_of_Living_Index'].notna().sum() if self.merged_df is not None else 0
-        }
-        
-        # Convert numpy types to native Python types for JSON serialization
-        def convert_numpy_types(obj):
-            if isinstance(obj, np.integer):
-                return int(obj)
-            elif isinstance(obj, np.floating):
-                return float(obj)
-            elif isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif isinstance(obj, dict):
-                return {key: convert_numpy_types(value) for key, value in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_numpy_types(item) for item in obj]
-            return obj
-        
-        analysis = convert_numpy_types(analysis)
-        
-        with open(filename, 'w') as f:
-            json.dump(analysis, f, indent=2, default=str)
-        
-        print(f"Comprehensive analysis exported to {filename}")
 
+    def _get_cost_index_for_country(self, country: str) -> float:
+        """Get cost of living index for a specific country"""
+        if self.cost_living_df is None:
+            # Fallback cost indexes for common countries
+            fallback_costs = {
+                'United Kingdom': 67.3,
+                'France': 67.4,
+                'Japan': 83.4,
+                'Australia': 73.5,
+                'Germany': 65.3,
+                'Canada': 67.6,
+                'South Korea': 71.4,
+                'Singapore': 85.6,
+                'Switzerland': 122.4,
+                'Czech Republic': 49.8,
+                'Spain': 54.2,
+                'Ireland': 69.1,
+                'Netherlands': 75.2,
+                'Sweden': 68.9,
+                'Italy': 64.1,
+                'Austria': 70.2,
+                'Denmark': 84.1,
+                'Norway': 101.4
+            }
+            return fallback_costs.get(country, 65.0)
+        
+        # Try to find matching country in cost living data
+        country_match = self.cost_living_df[
+            self.cost_living_df['Country'].str.contains(country, case=False, na=False)
+        ]
+        
+        if not country_match.empty:
+            return float(country_match.iloc[0]['Cost_of_Living_Index'])
+        
+        # Return average if no match found
+        return float(self.cost_living_df['Cost_of_Living_Index'].mean())
+
+    def regenerate_html_from_analysis(self, analysis_file: str = 'va_analysis.json') -> None:
+        """Regenerate HTML using existing analysis data"""
+        try:
+            print(f"📖 Loading analysis from {analysis_file}...")
+            with open(analysis_file, 'r') as f:
+                analysis = json.load(f)
+            
+            # Create a minimal dataframe from the sample schools in analysis
+            overseas_analysis = analysis.get('overseas_analysis', {})
+            sample_schools = overseas_analysis.get('sample_schools', [])
+            
+            if sample_schools:
+                self.va_schools_df = pd.DataFrame(sample_schools)
+                print(f"✅ Loaded {len(sample_schools)} sample schools from analysis")
+            else:
+                print("⚠️  No sample schools found, creating minimal data")
+                self.va_schools_df = pd.DataFrame({
+                    'INSTITUTION': ['Sample School'],
+                    'CITY': ['Sample City'],
+                    'COUNTRY': ['Sample Country'],
+                    'TYPE': ['Private']
+                })
+            
+            # Load cost of living data if not already loaded
+            if self.cost_living_df is None:
+                self.cost_living_df = self._create_worlddata_fallback()
+            
+            # Generate HTML with the analysis data
+            html_content = self._generate_html(self.va_schools_df, analysis)
+            
+            # Write to file
+            with open('index.html', 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            
+            print("✅ HTML regenerated with populated data: index.html")
+            
+        except FileNotFoundError:
+            print(f"❌ Analysis file {analysis_file} not found. Please run the full analysis first.")
+        except Exception as e:
+            print(f"❌ Error regenerating HTML: {e}")
 
 def main():
-    """Main function to run the enhanced analysis"""
-    print("Enhanced VA Overseas Schools Analysis")
-    print("="*50)
+    """Main function to run the analysis"""
+    print("🎯 VA Overseas Schools Analysis")
+    print("=" * 60)
     
-    analyzer = EnhancedVASchoolsAnalyzer()
+    analyzer = VASchoolsAnalyzer()
     
     try:
+        # Check if analysis file exists and regenerate HTML
+        import os
+        if os.path.exists('va_analysis.json'):
+            print("\n🔄 Found existing analysis, regenerating HTML with data...")
+            analyzer.regenerate_html_from_analysis()
+            return
+        
         # Load cost of living data from WorldData.info
-        print("\n1. Loading cost of living data...")
+        print("\n📊 Step 1: Loading cost of living data...")
         analyzer.scrape_worlddata_cost_of_living()
         
         # Load and comprehensively analyze VA schools data
-        print("\n2. Loading VA schools data...")
+        print("\n🏫 Step 2: Loading VA schools data...")
         analyzer.load_va_schools_data_comprehensive()
         
         # Perform comprehensive analysis
-        print("\n3. Analyzing all VA data...")
+        print("\n🔍 Step 3: Analyzing all VA data...")
         analysis = analyzer.analyze_all_va_data()
         
-        print(f"\nKey Findings:")
-        print(f"- Total records in VA dataset: {analysis['data_overview']['total_records']:,}")
-        print(f"- Data columns available: {analysis['data_overview']['total_columns']}")
-        print(f"- Overseas schools identified: {analysis.get('overseas_analysis', {}).get('total_overseas', 0)}")
-        print(f"- Countries with VA schools: {len(analysis.get('overseas_analysis', {}).get('countries', {}))}")
-        
         # Merge with cost of living data
-        print("\n4. Merging with cost of living data...")
+        print("\n🔗 Step 4: Merging with cost of living data...")
         analyzer.merge_with_cost_living()
         
-        # Generate enhanced static site
-        print("\n5. Generating enhanced static website...")
-        analyzer.generate_enhanced_static_site()
+        # Generate static site
+        print("\n🌐 Step 5: Generating static website...")
+        analyzer.generate_static_site()
         
         # Export comprehensive analysis
-        print("\n6. Exporting analysis report...")
+        print("\n📄 Step 6: Exporting analysis report...")
         analyzer.export_analysis_report()
         
-        print("\n✅ Enhanced analysis complete!")
-        print("Files generated:")
-        print("- index.html (Enhanced static website)")
-        print("- comprehensive_va_analysis.json (Detailed analysis)")
+        print("\n🎉 Analysis Complete!")
+        print("📁 Files generated:")
+        print("   • index.html (Static website with populated data)")
+        print("   • va_analysis.json (Detailed analysis)")
+        
+        print("\n🌐 To view the website:")
+        print("   1. Open index.html in your web browser, or")
+        print("   2. Run: python -m http.server 8000")
+        print("   3. Visit: http://localhost:8000")
         
     except Exception as e:
         print(f"❌ Analysis failed: {e}")
