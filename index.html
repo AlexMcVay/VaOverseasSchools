@@ -1,85 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VA Overseas Schools - Analysis</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VA OCONUS Schools</title>
+        
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <!-- TODO:add #2 data to navigation -->
         <header>
-            <h1>VA Approved Overseas Schools</h1>
-            <p class="subtitle">Complete listing of Veterans Affairs approved overseas schools with cost of living data</p>
+            <h1> VA Overseas Schools </h1>
+            <h2> A tool to show OCONUS Schools  approved by the VA</h2>
+            
         </header>
-
-        <main>
-            <section class="summary-stats">
-                <div class="stat-card">
-                    <h3>51</h3>
-                    <p>Total Overseas Schools</p>
+        
+        <main class="container">
+            <div id="filter-container">
+                <h3>Filter Schools</h3>
+                <div class="filter-group">
+                    <label class="filter-label" for="search-filter">Search:</label>
+                    <input type="text" id="search-filter" placeholder="Search by any column...">
                 </div>
-                <div class="stat-card">
-                    <h3>10</h3>
-                    <p>Countries Represented</p>
+                <div class="filter-group">
+                    <label class="filter-label" for="country-filter">Country:</label>
+                    <select id="country-filter">
+                        <option value="">All Countries</option>
+                        <!-- Countries will be populated dynamically -->
+                    </select>
                 </div>
-                <div class="stat-card">
-                    <h3>33</h3>
-                    <p>Private Schools</p>
+                <div class="filter-controls">
+                    <button id="reset-filters">Reset Filters</button>
                 </div>
-                <div class="stat-card">
-                    <h3>Updated</h3>
-                    <p>Latest VA Data</p>
-                </div>
-            </section>
-
-            <section class="schools-table">
-                <h2>VA Overseas Schools Directory</h2>
-                <div class="table-container">
-                    <table id="schoolsTable">
-                        <thead>
-                            <tr>
-                                <th>Institution</th>
-                                <th>City</th>
-                                <th>Country</th>
-                                <th>Type</th>
-                                <th>Cost of Living Index</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dynamic rows will be inserted here by script.js -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="country-analysis">
-                <h2>Schools by Country</h2>
-                <div class="country-grid">
-                    <!-- Dynamic country cards will be inserted here by script.js -->
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <div class="footer-content">
-                <p><strong>Data Sources:</strong></p>
-                <ul>
-                    <li><a href="https://www.benefits.va.gov/GIBILL/docs/job_aids/ComparisonToolData.xlsx" target="_blank">VA Comparison Tool Data</a></li>
-                    <li><a href="https://www.va.gov/education/about-gi-bill-benefits/how-to-use-benefits/school-search/" target="_blank">VA School Search</a></li>
-                </ul>
-                <p class="disclaimer">For official information, visit the <a href="https://www.va.gov" target="_blank">VA official website</a>.</p>
             </div>
+            
+            <div id="notebook-output-container">
+                <p class="loading-message">Loading content from notebook...</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p> Made by <a noopener="noopener" href="http://www.AlexMcVay.icu" target="_blank">AlexMcVay</a>. See the source code on <a noopener="noopener" href="https://github.com/AlexMcVay/VaOverseasSchools" target="_blank">GitHub</a> and the data at <a noopener="noopener" href="https://www.kaggle.com/code/alyamcvay/overseas-scools" target="_blank">Kaggle</a></p>
         </footer>
-    </div>
-
-    <div id="loadingIndicator" class="loading-indicator">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <p>Loading VA Schools Data...</p>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
+        
+        <script src="script.js"></script>
+    </body>
 </html>

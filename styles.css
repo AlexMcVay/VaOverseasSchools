@@ -1,306 +1,186 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+    /* New Enhanced Color Palette */
+    --main-color: #2c3e50;          /* Midnight Blue - Headers, footers */
+    --main-hover-color: #3a506b;    /* Slightly Lighter Midnight Blue - Hover for main elements */
+    --secondary-color: #ffffff;       /* White - Content cards, table backgrounds */
+    --background-color: #f4f6f8;      /* Alice Blue/Very Light Cool Gray - Page background */
+    
+    /* Adjusted accent for better contrast with white text on buttons */
+    --accent-color: #2980b9;        /* Belize Hole (was #3498db) - Buttons, interactive highlights */
+    --hover-color: #1f6698;         /* Darker Belize Hole (was #2980b9) - Hover for accent elements */
+
+    /* Text Colors */
+    --text-on-background: #34495e;  /* Wet Asphalt - General text on page background */
+    --text-on-main: #ecf0f1;        /* Clouds (Soft White) - Text on main-color (e.g., header, footer) */
+    --text-on-secondary: #34495e;   /* Wet Asphalt - Text on secondary-color (e.g., inside cards) */
+    --text-on-accent: #ffffff;        /* White - Text on accent-color buttons for better contrast */
+
+    /* UI Element Colors */
+    --border-color: #d1d5db;        /* Cool Gray 300 - Input borders, dividers */
+    --row-hover-color: #e9eff3;      /* Light Blueish Gray - Table row hover */
+    --even-row-color: #e9ecef;       /* Gray 200 - Table row striping */
 }
+
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f8f9fa;
+    background-color: var(--background-color);
+    margin: 0;
+    /* padding: 20px; Removed to let .container handle content spacing */
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Header Styles */
 header {
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    color: white;
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    padding: 1rem;
     text-align: center;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
+    margin-bottom: 20px; /* Added for spacing */
 }
 
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+/* Removed generic div styling; style specific divs with classes or IDs */
+/* div { ... } */
+ 
+.container { /* Changed from 'container' element selector */
+    max-width: 1200px; /* Center content and limit width */
+    margin: 20px auto; /* Top/bottom margin, auto left/right for centering */
+    padding: 20px;     /* Padding inside the container */
+ }
+ 
+#filter-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.subtitle {
-    font-size: 1.1rem;
-    opacity: 0.9;
+#filter-container input[type="text"],
+#filter-container select {
+    padding: 8px 12px;
+    flex-grow: 1; /* Allow input/select to take available space in flex group */
+    border: 1px solid var(--border-color); /* Use a more visible border color */
+    border-radius: 4px;
+    font-size: 1rem;
+    /* margin-bottom: 10px; Removed as .filter-group handles bottom margin */
 }
 
-/* Loading Indicator */
-.loading-indicator {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
+.filter-group {
     display: flex;
-    justify-content: center;
+    gap: 10px;
     align-items: center;
-    z-index: 1000;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
-.loading-content {
-    text-align: center;
-    color: #2c3e50;
+.filter-label {
+    font-weight: 600;
+    min-width: 100px;
 }
 
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
+.filter-controls button {
+    padding: 8px 15px;
+    background-color: var(--accent-color);
+    color: var(--text-on-accent); /* Changed for better contrast on new accent color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Enhanced Summary Statistics */
-.summary-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-.stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-
-.stat-card h3 {
-    font-size: 2.5rem;
-    color: #3498db;
-    margin-bottom: 0.5rem;
-}
-
-.stat-card p {
-    color: #7f8c8d;
-    font-weight: 500;
-}
-
-/* Enhanced Schools Table */
-.schools-table {
-    background: white;
-    border-radius: 10px;
-    padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 3rem;
-}
-
-.schools-table h2 {
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-}
-
-.table-container {
-    overflow-x: auto;
+.filter-controls button:hover {
+    background-color: var(--hover-color);
 }
 
 table {
     width: 100%;
+    max-width: none;
     border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #e9ecef;
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #2c3e50;
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    padding: 12px;
+    text-align: left;
     position: sticky;
     top: 0;
+    cursor: pointer;
+    position: relative;
+}
+
+th:hover {
+    background-color: var(--main-hover-color); /* Use hover specific to main color elements */
+}
+
+/* Sort indicators */
+th::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    color: var(--text-on-main);
+    opacity: 0.5;
+}
+
+th[data-sort="asc"]::after {
+    content: "↑";
+    opacity: 1;
+}
+
+th[data-sort="desc"]::after {
+    content: "↓";
+    opacity: 1;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color); /* Use a more defined border color */
+}
+
+tr:nth-child(even) {
+    background-color: var(--even-row-color); /* Use dedicated color for row striping */
 }
 
 tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--row-hover-color);
 }
 
-/* Enhanced Country Analysis */
-.country-analysis {
-    background: white;
-    border-radius: 10px;
-    padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 3rem;
-}
-
-.country-analysis h2 {
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-}
-
-.country-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.country-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-left: 4px solid #3498db;
-    transition: all 0.3s ease;
-}
-
-.country-card:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
-}
-
-.country-card h3 {
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.school-count {
-    color: #7f8c8d;
-    font-weight: 500;
-}
-
-/* Enhanced Footer */
-footer {
-    background-color: #2c3e50;
-    color: white;
-    padding: 2rem 0;
-    margin-top: 3rem;
-}
-
-.footer-content {
+.loading-message, .error-message {
+    padding: 20px;
     text-align: center;
+    font-style: italic;
+    background: var(--secondary-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.footer-content ul {
-    list-style: none;
-    margin: 1rem 0;
+.error-message {
+    color: var(--accent-color);
 }
 
-.footer-content li {
+/* Hide rows that don't match filter */
+tr.filtered {
+    display: none;
+}
+
+footer {
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    text-align: center;
+    padding: 1.5rem 1rem;
+    margin-top: 30px; /* Space above the footer */
+}
+
+footer p {
     margin: 0.5rem 0;
 }
 
-.footer-content a {
-    color: #3498db;
-    text-decoration: none;
-}
-
-.footer-content a:hover {
+footer a {
+    color: var(--text-on-main); /* Use text-on-main for footer links, consistent with footer text */
     text-decoration: underline;
 }
-
-.disclaimer {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-top: 1rem;
-}
-
-/* Search and Filter Enhancements */
-.search-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.search-input {
-    flex: 1;
-    max-width: 400px;
-    padding: 12px 20px;
-    border: 2px solid #e9ecef;
-    border-radius: 25px;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.search-input:focus {
-    border-color: #3498db;
-}
-
-.sort-indicator {
-    font-size: 0.8rem;
-    margin-left: 5px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 2rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
-    }
-    
-    .summary-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-    
-    .stat-card {
-        padding: 1rem;
-    }
-    
-    .stat-card h3 {
-        font-size: 2rem;
-    }
-    
-    .schools-table, .country-analysis {
-        padding: 1rem;
-    }
-    
-    th, td {
-        padding: 8px;
-        font-size: 0.9rem;
-    }
-    
-    .country-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .summary-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    header {
-        padding: 1.5rem 0;
-    }
-    
-    header h1 {
-        font-size: 1.8rem;
-    }
+footer a:hover {
+    color: var(--accent-color); /* Accent color for hover, makes it pop */
+    text-decoration: none;
 }
