@@ -1,19 +1,32 @@
 :root {
-    --main-color: #000000;
-    --secondary-color: #ffffff;
-    --background-color: #f5f5f5;
-    --accent-color: #0056b3;
-    --hover-color: #004494;
-    --text-on-background: #000000;
-    --text-on-main: #ffffff;
-    --text-on-secondary: #000000;
+    /* New Enhanced Color Palette */
+    --main-color: #2c3e50;          /* Midnight Blue - Headers, footers */
+    --main-hover-color: #3a506b;    /* Slightly Lighter Midnight Blue - Hover for main elements */
+    --secondary-color: #ffffff;       /* White - Content cards, table backgrounds */
+    --background-color: #f4f6f8;      /* Alice Blue/Very Light Cool Gray - Page background */
+    
+    /* Adjusted accent for better contrast with white text on buttons */
+    --accent-color: #2980b9;        /* Belize Hole (was #3498db) - Buttons, interactive highlights */
+    --hover-color: #1f6698;         /* Darker Belize Hole (was #2980b9) - Hover for accent elements */
+
+    /* Text Colors */
+    --text-on-background: #34495e;  /* Wet Asphalt - General text on page background */
+    --text-on-main: #ecf0f1;        /* Clouds (Soft White) - Text on main-color (e.g., header, footer) */
+    --text-on-secondary: #34495e;   /* Wet Asphalt - Text on secondary-color (e.g., inside cards) */
+    --text-on-accent: #ffffff;        /* White - Text on accent-color buttons for better contrast */
+
+    /* UI Element Colors */
+    --border-color: #d1d5db;        /* Cool Gray 300 - Input borders, dividers */
+    --row-hover-color: #e9eff3;      /* Light Blueish Gray - Table row hover */
+    --even-row-color: #e9ecef;       /* Gray 200 - Table row striping */
 }
+
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-color);
     margin: 0;
-    padding: 20px;
+    /* padding: 20px; Removed to let .container handle content spacing */
 }
 
 header {
@@ -21,18 +34,18 @@ header {
     color: var(--text-on-main);
     padding: 1rem;
     text-align: center;
+    margin-bottom: 20px; /* Added for spacing */
 }
- div{
-    width: auto;
-    height: auto;
-    padding: 0%;
+
+/* Removed generic div styling; style specific divs with classes or IDs */
+/* div { ... } */
+ 
+.container { /* Changed from 'container' element selector */
+    max-width: 1200px; /* Center content and limit width */
+    margin: 20px auto; /* Top/bottom margin, auto left/right for centering */
+    padding: 20px;     /* Padding inside the container */
  }
  
- container{
-    margin: 0%;
-    padding: 0%;
- }
-
 #filter-container {
     margin-bottom: 20px;
     padding: 15px;
@@ -41,13 +54,14 @@ header {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-#filter-container input {
+#filter-container input[type="text"],
+#filter-container select {
     padding: 8px 12px;
-    width: 100%;
-    border: 1px solid var(--background-color);
+    flex-grow: 1; /* Allow input/select to take available space in flex group */
+    border: 1px solid var(--border-color); /* Use a more visible border color */
     border-radius: 4px;
     font-size: 1rem;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; Removed as .filter-group handles bottom margin */
 }
 
 .filter-group {
@@ -61,6 +75,20 @@ header {
 .filter-label {
     font-weight: 600;
     min-width: 100px;
+}
+
+.filter-controls button {
+    padding: 8px 15px;
+    background-color: var(--accent-color);
+    color: var(--text-on-accent); /* Changed for better contrast on new accent color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+.filter-controls button:hover {
+    background-color: var(--hover-color);
 }
 
 table {
@@ -83,7 +111,7 @@ th {
 }
 
 th:hover {
-    background-color: var(--hover-color);
+    background-color: var(--main-hover-color); /* Use hover specific to main color elements */
 }
 
 /* Sort indicators */
@@ -107,15 +135,15 @@ th[data-sort="desc"]::after {
 
 td {
     padding: 10px;
-    border-bottom: 1px solid var(--background-color);
+    border-bottom: 1px solid var(--border-color); /* Use a more defined border color */
 }
 
 tr:nth-child(even) {
-    background-color: var(--background-color);
+    background-color: var(--even-row-color); /* Use dedicated color for row striping */
 }
 
 tr:hover {
-    background-color: var(--background-color);
+    background-color: var(--row-hover-color);
 }
 
 .loading-message, .error-message {
@@ -134,4 +162,25 @@ tr:hover {
 /* Hide rows that don't match filter */
 tr.filtered {
     display: none;
+}
+
+footer {
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    text-align: center;
+    padding: 1.5rem 1rem;
+    margin-top: 30px; /* Space above the footer */
+}
+
+footer p {
+    margin: 0.5rem 0;
+}
+
+footer a {
+    color: var(--text-on-main); /* Use text-on-main for footer links, consistent with footer text */
+    text-decoration: underline;
+}
+footer a:hover {
+    color: var(--accent-color); /* Accent color for hover, makes it pop */
+    text-decoration: none;
 }
