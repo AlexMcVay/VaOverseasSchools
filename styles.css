@@ -2,4 +2,136 @@
     --main-color: #000000;
     --secondary-color: #ffffff;
     --background-color: #f5f5f5;
+    --accent-color: #0056b3;
+    --hover-color: #004494;
+    --text-on-background: #000000;
+    --text-on-main: #ffffff;
+    --text-on-secondary: #000000;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    padding: 1rem;
+    text-align: center;
+}
+ div{
+    width: auto;
+    height: auto;
+    padding: 0%;
+ }
+ 
+ container{
+    margin: 0%;
+    padding: 0%;
+ }
+
+#filter-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#filter-container input {
+    padding: 8px 12px;
+    width: 100%;
+    border: 1px solid var(--background-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-weight: 600;
+    min-width: 100px;
+}
+
+table {
+    width: 100%;
+    max-width: none;
+    border-collapse: collapse;
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th {
+    background-color: var(--main-color);
+    color: var(--text-on-main);
+    padding: 12px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    cursor: pointer;
+    position: relative;
+}
+
+th:hover {
+    background-color: var(--hover-color);
+}
+
+/* Sort indicators */
+th::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    color: var(--text-on-main);
+    opacity: 0.5;
+}
+
+th[data-sort="asc"]::after {
+    content: "↑";
+    opacity: 1;
+}
+
+th[data-sort="desc"]::after {
+    content: "↓";
+    opacity: 1;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid var(--background-color);
+}
+
+tr:nth-child(even) {
+    background-color: var(--background-color);
+}
+
+tr:hover {
+    background-color: var(--background-color);
+}
+
+.loading-message, .error-message {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    background: var(--secondary-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.error-message {
+    color: var(--accent-color);
+}
+
+/* Hide rows that don't match filter */
+tr.filtered {
+    display: none;
 }

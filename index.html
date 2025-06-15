@@ -4,25 +4,46 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>VA OCONUS Schools</title>
+        
         <link rel="stylesheet" href="styles.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     </head>
     <body>
         <!-- TODO:add #2 data to navigation -->
         <header>
-            <h1>
-                <nav>
-                    
-                </nav>
-            </h1>
+            <h1> VA Overseas Schools </h1>
+            <h2> A tool to show OCONUS Schools  approved by the VA</h2>
+            
         </header>
-        <div id="notebook-output-container">
-            <p class="loading-message">Loading content from notebook...</p>
-        </div>
+        
+        <main class="container">
+            <div id="filter-container">
+                <h3>Filter Schools</h3>
+                <div class="filter-group">
+                    <label class="filter-label" for="search-filter">Search:</label>
+                    <input type="text" id="search-filter" placeholder="Search by any column...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="country-filter">Country:</label>
+                    <select id="country-filter">
+                        <option value="">All Countries</option>
+                        <!-- Countries will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-controls">
+                    <button id="reset-filters">Reset Filters</button>
+                </div>
+            </div>
+            
+            <div id="notebook-output-container">
+                <p class="loading-message">Loading content from notebook...</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p> Made by <a noopener="noopener" href="http://www.AlexMcVay.icu" target="_blank">AlexMcVay</a></p>
+            <p>see the source code on <a noopener="noopener" href="https://github.com/AlexMcVay/VaOverseasSchools" target="_blank">GitHub</a> and the data at <a noopener="noopener" href="https://www.kaggle.com/code/alyamcvay/overseas-scools" target="_blank">Kaggle</a></p>
+        </footer>
+        
         <script src="script.js"></script>
     </body>
-    <footer>
-        <!-- TODO:Add #1 Ad -->
-    </footer>
 </html>
